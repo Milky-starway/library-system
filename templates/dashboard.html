@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Welcome, {{ user.name }}</h1>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-value">{{ total_books }}</span>
+        <span class="stat-label">Titles in catalog</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ available_copies }} / {{ total_copies }}</span>
+        <span class="stat-label">Copies available</span>
+    </div>
+    {% if user.is_staff %}
+    <div class="stat-card">
+        <span class="stat-value">{{ active_loans }}</span>
+        <span class="stat-label">Active loans</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ total_members }}</span>
+        <span class="stat-label">Members</span>
+    </div>
+    {% else %}
+    <div class="stat-card">
+        <span class="stat-value">{{ my_books_read }}</span>
+        <span class="stat-label">Books read</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ "%.1f"|format(my_hours) }}</span>
+        <span class="stat-label">Hours reading in library</span>
+    </div>
+    {% endif %}
+</div>
+
+{% if user.is_staff %}
+<div class="action-row">
+    <a href="/loans/checkout" class="btn-primary">Check out a book</a>
+    <a href="/books/new" class="btn-secondary">Add a book</a>
+    <a href="/reading/new" class="btn-secondary">Log reading session</a>
+</div>
+{% else %}
+<h2>Your current loans</h2>
+{% if my_loans %}
+<table class="data-table">
+    <thead><tr><th>Title</th><th>Due date</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for loan in my_loans %}
+        <tr>
+            <td>{{ loan.book.title }}</td>
+            <td>{{ loan.due_date.strftime('%Y-%m-%d') }}</td>
+            <td>{% if loan.is_overdue %}<span class="badge-overdue">Overdue</span>{% else %}<span class="badge-ok">On loan</span>{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="muted">You have no active loans. <a href="/books">Browse the catalog</a>.</p>
+{% endif %}
+{% endif %}
+{% endblock %}

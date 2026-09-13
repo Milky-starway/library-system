@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Reading Stats{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Member Reading Stats</h1>
+    <div class="action-row" style="margin-bottom:0;">
+        <a href="/reading/export.csv" class="btn-secondary">Download report (CSV)</a>
+        <a href="/reading/new" class="btn-primary">+ Log a reading session</a>
+    </div>
+</div>
+
+<table class="data-table">
+    <thead><tr><th>Member</th><th>Books read</th><th>Titles</th><th>Hours in library</th><th>Last session</th></tr></thead>
+    <tbody>
+    {% for s in member_summaries %}
+        <tr>
+            <td><a href="/reading/member/{{ s.member.id }}">{{ s.member.name }}</a></td>
+            <td>{{ s.books_read_count }}</td>
+            <td class="muted">
+                {% if s.books_breakdown %}
+                    {{ s.books_breakdown[:2] | map(attribute='book.title') | join(", ") }}{% if s.books_breakdown|length > 2 %}, +{{ s.books_breakdown|length - 2 }} more{% endif %}
+                {% else %}—{% endif %}
+            </td>
+            <td>{{ "%.1f"|format(s.total_hours) }}</td>
+            <td>{{ s.logs[0].date.strftime('%Y-%m-%d') if s.logs else "—" }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5" class="muted">No members yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

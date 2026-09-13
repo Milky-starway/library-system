@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Books{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Book Catalog</h1>
+    {% if user.is_staff %}<a href="/books/new" class="btn-primary">+ Add book</a>{% endif %}
+</div>
+
+<form method="get" action="/books" class="search-bar">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search by title, author, or ISBN...">
+    <button type="submit" class="btn-secondary">Search</button>
+</form>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Title</th><th>Author</th><th>Category</th><th>ISBN</th><th>Available</th>
+            {% if user.is_staff %}<th></th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.category or "—" }}</td>
+            <td>{{ book.isbn or "—" }}</td>
+            <td>
+                {% if book.available_copies > 0 %}
+                <span class="badge-ok">{{ book.available_copies }} / {{ book.total_copies }}</span>
+                {% else %}
+                <span class="badge-overdue">0 / {{ book.total_copies }}</span>
+                {% endif %}
+            </td>
+            {% if user.is_staff %}
+            <td class="row-actions">
+                <a href="/books/{{ book.id }}/edit">Edit</a>
+                <form method="post" action="/books/{{ book.id }}/delete" onsubmit="return confirm('Delete this book?');">
+                    <button type="submit" class="btn-link-danger">Delete</button>
+                </form>
+            </td>
+            {% endif %}
+        </tr>
+    {% else %}
+        <tr><td colspan="6" class="muted">No books found.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

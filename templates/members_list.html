@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Members{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Members &amp; Staff</h1>
+    <div class="action-row" style="margin-bottom:0;">
+        <a href="/members/export.csv" class="btn-secondary">Download report (CSV)</a>
+        <a href="/members/new" class="btn-primary">+ Add person</a>
+    </div>
+</div>
+
+<table class="data-table">
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last login</th><th></th></tr></thead>
+    <tbody>
+    {% for m in members %}
+        <tr>
+            <td>{{ m.name }}</td>
+            <td>{{ m.email }}</td>
+            <td><span class="badge-role">{{ m.role.value }}</span></td>
+            <td class="muted">{{ m.last_login.strftime('%Y-%m-%d %H:%M') if m.last_login else "Never" }}</td>
+            <td class="row-actions">
+                {% if m.role.value == "member" %}<a href="/reading">Reading history</a>{% endif %}
+                {% if m.id != user.id %}
+                <form method="post" action="/members/{{ m.id }}/delete" onsubmit="return confirm('Remove this person?');">
+                    <button type="submit" class="btn-link-danger">Remove</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

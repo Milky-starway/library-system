@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Loans{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>{{ "All Loans" if user.is_staff else "My Loans" }}</h1>
+    {% if user.is_staff %}<a href="/loans/checkout" class="btn-primary">+ Check out a book</a>{% endif %}
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Book</th>
+            {% if user.is_staff %}<th>Member</th>{% endif %}
+            <th>Checked out</th><th>Due</th><th>Status</th>
+            {% if user.is_staff %}<th></th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for loan in loans %}
+        <tr>
+            <td>{{ loan.book.title }}</td>
+            {% if user.is_staff %}<td>{{ loan.member.name }}</td>{% endif %}
+            <td>{{ loan.checkout_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ loan.due_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+                {% if loan.is_returned %}
+                <span class="badge-ok">Returned {{ loan.return_date.strftime('%Y-%m-%d') }}</span>
+                {% elif loan.due_date < now %}
+                <span class="badge-overdue">Overdue</span>
+                {% else %}
+                <span class="badge-role">On loan</span>
+                {% endif %}
+            </td>
+            {% if user.is_staff %}
+            <td>
+                {% if not loan.is_returned %}
+                <form method="post" action="/loans/{{ loan.id }}/return">
+                    <button type="submit" class="btn-secondary">Mark returned</button>
+                </form>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+    {% else %}
+        <tr><td colspan="6" class="muted">No loans yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

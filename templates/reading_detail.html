@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ member.name }}'s Reading{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>{{ member.name }}'s Reading History</h1>
+    <a href="/reading" class="btn-secondary">&larr; Back to all members</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <span class="stat-value">{{ books_read_count }}</span>
+        <span class="stat-label">Books finished</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">{{ "%.1f"|format(total_hours) }}</span>
+        <span class="stat-label">Total hours in library</span>
+    </div>
+</div>
+
+<h2>By book</h2>
+<table class="data-table">
+    <thead><tr><th>Title</th><th>Hours spent</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for b in books_breakdown %}
+        <tr>
+            <td>{{ b.book.title }}</td>
+            <td>{{ "%.1f"|format(b.hours) }}</td>
+            <td>{% if b.finished %}<span class="badge-ok">Finished</span>{% else %}<span class="muted">In progress</span>{% endif %}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="3" class="muted">No reading sessions logged yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h2>Session log</h2>
+<table class="data-table">
+    <thead><tr><th>Date</th><th>Book</th><th>Hours</th><th>Finished</th></tr></thead>
+    <tbody>
+    {% for log in logs %}
+        <tr>
+            <td>{{ log.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ log.book.title }}</td>
+            <td>{{ log.hours }}</td>
+            <td>{% if log.finished %}<span class="badge-ok">Yes</span>{% else %}<span class="muted">No</span>{% endif %}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4" class="muted">No sessions yet.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

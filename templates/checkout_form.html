@@ -15,7 +15,7 @@
     <select name="member_id" required>
         <option value="" disabled selected>Select a member...</option>
         {% for m in members %}
-        <option value="{{ m.id }}">{{ m.name }} ({{ m.email }})</option>
+        <option value="{{ m.id }}">{{ m.name }} ({{ m.username }})</option>
         {% endfor %}
     </select>
     <p class="muted">Due in 14 days from today.</p>

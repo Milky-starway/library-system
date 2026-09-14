@@ -10,12 +10,12 @@
 </div>
 
 <table class="data-table">
-    <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last login</th><th></th></tr></thead>
+    <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Last login</th><th></th></tr></thead>
     <tbody>
     {% for m in members %}
         <tr>
             <td>{{ m.name }}</td>
-            <td>{{ m.email }}</td>
+            <td>{{ m.username }}</td>
             <td><span class="badge-role">{{ m.role.value }}</span></td>
             <td class="muted">{{ m.last_login.strftime('%Y-%m-%d %H:%M') if m.last_login else "Never" }}</td>
             <td class="row-actions">

@@ -52,24 +52,22 @@ def seed_admins():
     try:
         if db.query(User).count() == 0:
             default_admins = [
-                {"name": "Head Librarian", "email": "admin1@library.local", "password": "admin123"},
-                {"name": "Assistant Librarian", "email": "admin2@library.local", "password": "admin123"},
-                {"name": "Circulation Staff", "email": "admin3@library.local", "password": "admin123"},
+                {"name": "Head Librarian", "username": "admin1", "password": "admin123"},
+                {"name": "Assistant Librarian", "username": "admin2", "password": "admin123"},
+                {"name": "Circulation Staff", "username": "admin3", "password": "admin123"},
             ]
             for a in default_admins:
                 db.add(User(
                     name=a["name"],
-                    email=a["email"],
+                    username=a["username"],
                     password_hash=hash_password(a["password"]),
                     role=Role.STAFF,
                 ))
             db.commit()
-            print("Created 3 initial staff accounts: admin1/2/3@library.local (password: admin123)")
+            print("Created 3 initial staff accounts: admin1/admin2/admin3 (password: admin123)")
             print("IMPORTANT: change these passwords after first login.")
     finally:
         db.close()
-
-
 @app.get("/", response_class=HTMLResponse)
 def dashboard(request: Request, db: Session = Depends(get_db)):
     user = get_current_user(request, db)

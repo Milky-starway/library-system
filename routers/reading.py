@@ -41,19 +41,18 @@ def export_reading_csv(request: Request, db: Session = Depends(get_db)):
     user = require_staff(request, db)
     logs = db.query(ReadingLog).join(User, ReadingLog.member_id == User.id).all()
 
-    # Sort by member name, then most recent session first within each member
     logs_sorted = sorted(logs, key=lambda l: (l.member.name, -l.date.timestamp()))
 
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(["Member Name", "Member Email", "Book Title", "Date", "Hours", "Finished"])
+    writer.writerow(["Member Name", "Username", "Book Title", "Date", "Hours", "Finished"])
 
     last_member_id = None
     for l in logs_sorted:
         is_new_member = l.member_id != last_member_id
         writer.writerow([
             l.member.name if is_new_member else "",
-            l.member.email if is_new_member else "",
+            l.member.username if is_new_member else "",
             l.book.title,
             l.date.strftime("%Y-%m-%d"), l.hours, "Yes" if l.finished else "No",
         ])

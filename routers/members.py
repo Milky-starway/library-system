@@ -21,10 +21,11 @@ def export_members_csv(request: Request, db: Session = Depends(get_db)):
 
     buffer = io.StringIO()
     writer = csv.writer(buffer)
-    writer.writerow(["Name", "Email", "Role", "Account Created", "Last Login"])
+    writer.writerow(["Name", "Username", "Email", "Role", "Account Created", "Last Login"])
     for m in members:
         writer.writerow([
-            m.name, m.email, m.role.value,
+            m.name, m.username, m.email or "",
+            m.role.value,
             m.created_at.strftime("%Y-%m-%d") if m.created_at else "",
             m.last_login.strftime("%Y-%m-%d %H:%M") if m.last_login else "Never logged in",
         ])
@@ -56,21 +57,24 @@ def new_member_form(request: Request, db: Session = Depends(get_db)):
 def new_member_submit(
     request: Request,
     name: str = Form(...),
-    email: str = Form(...),
+    username: str = Form(...),
     password: str = Form(...),
+    email: str = Form(""),
     role: str = Form("member"),
     db: Session = Depends(get_db),
 ):
     user = require_staff(request, db)
-    existing = db.query(User).filter(User.email == email).first()
+    username = username.strip().lower()
+    existing = db.query(User).filter(User.username == username).first()
     if existing:
         return templates.TemplateResponse(
             "member_form.html",
-            {"request": request, "user": user, "error": "Email already in use"},
+            {"request": request, "user": user, "error": "That username is already taken"},
         )
     new_user = User(
         name=name,
-        email=email,
+        username=username,
+        email=email.strip() or None,
         password_hash=hash_password(password),
         role=Role.STAFF if role == "staff" else Role.MEMBER,
     )

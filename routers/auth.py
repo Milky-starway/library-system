@@ -23,14 +23,14 @@ def login_form(request: Request, db: Session = Depends(get_db)):
 @router.post("/login", response_class=HTMLResponse)
 def login_submit(
     request: Request,
-    email: str = Form(...),
+    username: str = Form(...),
     password: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.email == email).first()
+    user = db.query(User).filter(User.username == username.strip().lower()).first()
     if not user or not verify_password(password, user.password_hash):
         return templates.TemplateResponse(
-            "login.html", {"request": request, "error": "Invalid email or password"}
+            "login.html", {"request": request, "error": "Invalid username or password"}
         )
     request.session["user_id"] = user.id
     user.last_login = datetime.utcnow()
@@ -55,18 +55,23 @@ def register_form(request: Request, db: Session = Depends(get_db)):
 def register_submit(
     request: Request,
     name: str = Form(...),
-    email: str = Form(...),
+    username: str = Form(...),
     password: str = Form(...),
+    email: str = Form(""),
     db: Session = Depends(get_db),
 ):
-    existing = db.query(User).filter(User.email == email).first()
+    username = username.strip().lower()
+    existing = db.query(User).filter(User.username == username).first()
     if existing:
         return templates.TemplateResponse(
-            "register.html", {"request": request, "error": "Email already registered"}
+            "register.html", {"request": request, "error": "That username is already taken"}
         )
     # Public self-registration always creates a member account.
     # Staff accounts are created by an existing staff member from the Members page.
-    user = User(name=name, email=email, password_hash=hash_password(password), role=Role.MEMBER)
+    user = User(
+        name=name, username=username, email=email.strip() or None,
+        password_hash=hash_password(password), role=Role.MEMBER,
+    )
     db.add(user)
     db.commit()
     request.session["user_id"] = user.id

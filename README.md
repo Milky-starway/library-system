@@ -23,11 +23,14 @@ PostgreSQL/MySQL by changing one line in `.env`.
    Open http://127.0.0.1:8000
 
 4. **Log in** with one of the three seeded staff accounts (created automatically on
-   first run — change these passwords right away):
-   - admin1@library.local / admin123
-   - admin2@library.local / admin123
-   - admin3@library.local / admin123
+   first run). These are demo accounts for testing only, so change the passwords
+   right away:
 
+   ```
+   admin1 / admin123
+   admin2 / admin123
+   admin3 / admin123
+   ```
 5. **From there**, as staff you can: add books (`Books` → `+ Add book`), add more
    staff or members (`Members`), check books out to members and mark returns
    (`Loans`), and log in-library reading sessions (`Reading` → `+ Log a reading
